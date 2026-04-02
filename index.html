@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hieroglyphic Name Encryption</title>
+    <style>
+        /* Import Google Font for a modern, bold look */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
+
+        :root {
+            --bg-stone: #12100e;
+            /* Extremely dark sand/stone */
+            --gold-light: #ffff;
+            --gold-main: #fff;
+            --gold-dim: #fff;
+            --lapis: #fff;
+            /* Lapis lazuli */
+            --lapis-glow: rgba(255, 255, 255, 0.6);
+            --curse-glow: rgba(255, 255, 255, 0.4);
+            --font-main: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body,
+        html {
+            background-color: #000;
+            /* Generated cinematic Egyptian tomb image */
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: normal;
+            color: var(--gold-light);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            box-sizing: border-box;
+
+            /* Apply a flickering torch lighting effect over the entire tomb environment */
+        }
+
+        /* Ambient vignette overlay to direct focus to the center and darken edges heavily */
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.95) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #terminal {
+            width: 100%;
+            height: 100%;
+            padding: 3vw 5vw;
+            box-sizing: border-box;
+            display: block;
+            position: relative;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.4);
+            /* Ensures the exact text area is deeply dark */
+        }
+
+        #terminal.center-stage {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .line {
+            font-size: 4.8vw;
+            line-height: 1.25;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            word-wrap: break-word;
+            margin-bottom: 0.5vw;
+            text-transform: uppercase;
+            /* High contrast solid gold text */
+            color: #ffffff;
+        }
+
+        .dense .line {
+            font-size: 2.8vw;
+        }
+
+        .hieroglyph-line .line {
+            font-size: 3.5vw;
+        }
+
+        .input-line-wrapper {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 4.8vw;
+            line-height: 1.25;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .input-line-wrapper input,
+        .input-line-wrapper span[contenteditable] {
+            color: var(--gold-light);
+            text-transform: uppercase;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 0.8vw;
+            height: 4.3vw;
+            background-color: var(--lapis);
+            vertical-align: text-bottom;
+            margin-left: 0.4vw;
+            box-shadow: 0 0 15px var(--lapis);
+            animation: blink 1s step-end infinite;
+        }
+
+        .dense .cursor,
+        .hieroglyph-line .cursor {
+            height: 2.8vw;
+        }
+
+        /* Glowing curse effect for the final Hieroglyphs */
+        .hieroglyph {
+            font-family: sans-serif;
+            color: #fff;
+            text-shadow:
+                0 0 10px var(--gold-main),
+                0 0 25px var(--gold-main),
+                0 0 50px #ff4500;
+            /* Subtle fiery red curse undertone */
+            animation: pulse-curse 2s infinite alternate ease-in-out;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+
+        /* Interaction glow */
+        .hieroglyph:hover {
+            color: #ffffff;
+            text-shadow:
+                0 0 20px #ffffff,
+                0 0 40px var(--gold-light),
+                0 0 70px #ff0000;
+            transform: scale(1.3);
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+                box-shadow: none;
+            }
+        }
+
+        @keyframes pulse-curse {
+            0% {
+                text-shadow: 0 0 15px #f00, 0 0 20px #8b0000;
+                filter: brightness(0.8) sepia(0.5);
+                transform: scale(0.98);
+            }
+
+            100% {
+                text-shadow: 0 0 40px #ff4500, 0 0 70px #ff0000;
+                filter: brightness(1.3) sepia(0);
+                transform: scale(1.05);
+            }
+        }
+
+        /* Game Over / Success Overlays */
+        #game-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        #game-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .victory-text {
+            font-size: 8vw;
+            color: #fff;
+            text-shadow: 0 0 30px #ffcf00;
+            margin-bottom: 2vw;
+            animation: victory-pulse 2s infinite alternate;
+        }
+
+        @keyframes victory-pulse {
+            from {
+                text-shadow: 0 0 20px #ffcf00;
+                transform: scale(1);
+            }
+
+            to {
+                text-shadow: 0 0 50px #fff;
+                transform: scale(1.05);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        ::selection {
+            background: var(--lapis);
+            color: #fff;
+            text-shadow: none;
+            -webkit-text-fill-color: #fff;
+        }
+
+        /* Dynamic Background Letters */
+        #bg-letters-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-letter {
+            position: absolute;
+            color: rgba(255, 240, 180, 0.15);
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 10vw;
+            pointer-events: none;
+            text-shadow:
+                0 0 20px rgba(255, 215, 0, 0.5),
+                0 0 60px rgba(255, 165, 0, 0.3);
+            animation: bg-letter-fade 4s forwards cubic-bezier(0.22, 1, 0.36, 1);
+            user-select: none;
+            z-index: 0;
+        }
+
+        @keyframes bg-letter-fade {
+            0% {
+                transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+                opacity: 0;
+                filter: blur(15px);
+            }
+
+            15% {
+                opacity: 0.7;
+                filter: blur(0px);
+                transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(2.5) translateY(-250px) rotate(-15deg);
+                opacity: 0;
+                filter: blur(30px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-overlay">
+        <div class="victory-text">THE CURSE IS BROKEN</div>
+        <div class="line" style="font-size: 2vw;">YOUR LINEAGE IS FINALLY FREE</div>
+        <div class="line" style="font-size: 1.2vw; margin-top: 4vw; opacity: 0.5;">PRESS ENTER TO RETURN TO THE TOMB
+        </div>
+    </div>
+    <div id="bg-letters-container"></div>
+    <div id="terminal"></div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const bgContainer = document.getElementById('bg-letters-container');
+        const delay = 40; // Speed of typing in ms per character
+
+        function spawnLetter(char) {
+            if (!char || char === ' ') return;
+            const letter = document.createElement('div');
+            letter.className = 'bg-letter';
+            letter.textContent = char.toUpperCase();
+
+            // Random position
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+
+            letter.style.left = x + '%';
+            letter.style.top = y + '%';
+
+            const rotate = (Math.random() - 0.5) * 60;
+            letter.style.transform += ` rotate(${rotate}deg)`;
+
+            bgContainer.appendChild(letter);
+            setTimeout(() => letter.remove(), 3000);
+        }
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function clearScreen() {
+            terminal.innerHTML = "";
+        }
+
+        async function typeLine(text, isHTML = false, addWait = 0) {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'line';
+            terminal.appendChild(lineDiv);
+
+            if (isHTML) {
+                lineDiv.innerHTML = text;
+                return lineDiv;
+            }
+
+            let currentText = "";
+            for (let i = 0; i < text.length; i++) {
+                currentText += text.charAt(i);
+                lineDiv.innerHTML = currentText + '<span class="cursor"></span>';
+                spawnLetter(text.charAt(i));
+                await sleep(delay);
+            }
+            lineDiv.innerHTML = currentText;
+            if (addWait > 0) await sleep(addWait);
+            return lineDiv;
+        }
+
+        async function promptInput(promptText) {
+            const wrapper = document.createElement('div');
+            wrapper.className = "input-line-wrapper";
+            const label = document.createElement('span');
+            wrapper.appendChild(label);
+            terminal.appendChild(wrapper);
+
+            let currentText = "";
+            for (let i = 0; i < promptText.length; i++) {
+                currentText += promptText.charAt(i);
+                label.textContent = currentText;
+                await sleep(delay);
+            }
+
+            const inputSpan = document.createElement('span');
+            inputSpan.contentEditable = "true";
+            inputSpan.style.outline = "none";
+            inputSpan.style.minWidth = "2vw";
+            inputSpan.style.display = "inline-block";
+            wrapper.appendChild(inputSpan);
+
+            const cSpan = document.createElement('span');
+            cSpan.className = 'cursor';
+            wrapper.appendChild(cSpan);
+
+            inputSpan.focus();
+            document.addEventListener('click', () => inputSpan.focus());
+
+            return new Promise(resolve => {
+                inputSpan.addEventListener('input', function (e) {
+                    const text = inputSpan.innerText;
+                    if (text.length > 0) spawnLetter(text.charAt(text.length - 1));
+                    const cleanText = text.replace(/[^A-Za-z ]/g, '');
+                    if (text !== cleanText) {
+                        inputSpan.innerText = cleanText;
+                        const range = document.createRange();
+                        const sel = window.getSelection();
+                        range.selectNodeContents(inputSpan);
+                        range.collapse(false);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                });
+
+                inputSpan.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = inputSpan.innerText;
+                        inputSpan.contentEditable = "false";
+                        cSpan.remove();
+                        resolve(val.trim());
+                    }
+                });
+            });
+        }
+
+        // Handle full screen "Slide" / Section transitions
+        async function playStep(linesCallback, options = {}) {
+            clearScreen();
+
+            if (options.dense) terminal.classList.add('dense');
+            else terminal.classList.remove('dense');
+
+            if (options.hiero) terminal.classList.add('hieroglyph-line');
+            else terminal.classList.remove('hieroglyph-line');
+
+            if (options.center) terminal.classList.add('center-stage');
+            else terminal.classList.remove('center-stage');
+
+            await linesCallback();
+
+            if (options.waitForEnter !== false) {
+                // Drop a blinking cursor indicating readiness for the next step 
+                const cLine = document.createElement('div');
+                cLine.className = 'line';
+                cLine.innerHTML = '<span style="font-size: 0.5em; opacity: 0.5;">[Unlock the Seal - Press Enter] </span><span class="cursor"></span>';
+                terminal.appendChild(cLine);
+
+                return new Promise(resolve => {
+                    const handler = (e) => {
+                        if (e.key === 'Enter') {
+                            document.removeEventListener('keydown', handler);
+                            resolve();
+                        }
+                    };
+                    document.addEventListener('keydown', handler);
+                });
+            }
+        }
+
+        async function generateOutput(name) {
+            const lettersOnly = name.toUpperCase().replace(/[^A-Z]/g, '');
+            if (!lettersOnly) {
+                await playStep(async () => {
+                    await typeLine("Error: No valid alphabetical letters found in the name.");
+                    await typeLine("Please try again.");
+                }, { waitForEnter: true });
+
+                runProgram(); // Restart the experience
+                return;
+            }
+
+            let origNumbers = [];
+            for (let i = 0; i < lettersOnly.length; i++) {
+                origNumbers.push(lettersOnly.charCodeAt(i) - 64);
+            }
+
+            let encNumbers = [];
+            let encLetters = [];
+            let encLettersJoined = "";
+            let hieroglyphs = "";
+
+            for (let i = 0; i < origNumbers.length; i++) {
+                let x = origNumbers[i];
+                let res = ((3 * x) + 2) % 26;
+                if (res === 0) res = 26;
+                encNumbers.push(res);
+                let encChar = String.fromCharCode(64 + res);
+                encLetters.push(encChar);
+                encLettersJoined += encChar;
+            }
+
+            // STEP 3
+            await playStep(async () => {
+                await typeLine(`The Ancestor ${name} has been identified.`, false, 500);
+                await typeLine("The Curse will be dissolved through the Ritual of Transmutation.", false, 500);
+                await typeLine("By the law of f(x) = 3x + 2 mod 26, the spirit manifests.");
+            }, { dense: true });
+
+            // STEP 4
+            await playStep(async () => {
+                await typeLine(" [SEAL 1: ALPHABETIC RECALL]", false, 400);
+                await typeLine(`Sacred Name: ${name}`, false, 400);
+                await typeLine(`Vibrational Letters: ${lettersOnly.split("").join(", ")}`);
+            });
+
+            // STEP 5
+            await playStep(async () => {
+                await typeLine(" [SEAL 2: NUMERICAL WEIGHT]", false, 400);
+                await typeLine("Each glyph carries a mortal weight (A=1...Z=26)", false, 400);
+                await typeLine(`Weight values: ${origNumbers.join(", ")}`);
+            });
+
+            // STEP 6
+            await playStep(async () => {
+                await typeLine(" [SEAL 3: THE ALCHEMIST'S KEY]", false, 400);
+                await typeLine("To shift the fate, multiply the weight by 3 and add 2.", false, 400);
+                await typeLine("f(x) = 3x + 2 mod 26");
+            });
+
+            // STEP 7
+            await playStep(async () => {
+                await typeLine(" [SEAL 4: THE NEW DESTINY]", false, 400);
+                await typeLine(`Transmuted numbers: ${encNumbers.join(", ")}`);
+            });
+
+            // STEP 8
+            await playStep(async () => {
+                await typeLine(" [SEAL 5: PHONETIC SHIFT]", false, 400);
+                await typeLine(`New vibration: ${encLetters.join(", ")}`);
+            });
+
+            const hieroglyphMap = {
+                'A': '𓄿', 'B': '𓃀', 'C': '𓍿', 'D': '𓂧', 'E': '𓇋',
+                'F': '𓆑', 'G': '𓎼', 'H': '𓉔', 'I': '𓇋', 'J': '𓆓',
+                'K': '𓎡', 'L': '𓃭', 'M': '𓅓', 'N': '𓈖', 'O': '𓂝',
+                'P': '𓊪', 'Q': '𓈎', 'R': '𓂋', 'S': '𓋴', 'T': '𓏏',
+                'U': '𓅱', 'V': '𓆑', 'W': '𓅱', 'X': '𓐍', 'Y': '𓇋',
+                'Z': '𓊃'
+            };
+
+            // STEP 9
+            await playStep(async () => {
+                await typeLine(" [FINAL SEAL: HIEROGLYPHIC MANIFESTATION]", false, 400);
+                for (let i = 0; i < encLetters.length; i++) {
+                    let letter = encLetters[i];
+                    let symbol = hieroglyphMap[letter];
+                    hieroglyphs += symbol;
+                    await typeLine(`${letter} -> <span class="hieroglyph">${symbol}</span>`, true);
+                    await sleep(300);
+                }
+                await typeLine(`Final Holy Seal:`, false, 300);
+                await typeLine(`<span class="hieroglyph">${hieroglyphs}</span>`, true);
+            }, { hiero: true });
+
+            // STEP 10
+            await playStep(async () => {
+                await typeLine(" [THE RITUAL IS COMPLETE]", false, 400);
+                await typeLine(`Ancestor: ${name}`);
+                await typeLine(`Sacred Seal: <span class="hieroglyph">${hieroglyphs}</span>`, true);
+                await sleep(1000);
+                await typeLine("THE CURSE IS WEAKENING...");
+                await sleep(1500);
+            }, { dense: true, waitForEnter: true });
+
+            // Victory Screen
+            const overlay = document.getElementById('game-overlay');
+            overlay.classList.add('active');
+
+            return new Promise(resolve => {
+                const handler = (e) => {
+                    if (e.key === 'Enter') {
+                        document.removeEventListener('keydown', handler);
+                        overlay.classList.remove('active');
+                        resolve();
+                        runProgram();
+                    }
+                };
+                document.addEventListener('keydown', handler);
+            });
+        }
+
+        async function runProgram() {
+            // PROLOGUE
+            await playStep(async () => {
+                await typeLine("You open your eyes. The air is heavy with the scent of ancient dust.", false, 1000);
+                await typeLine("Cold stone walls rise around you, etched with stories of a forgotten age.", false, 1000);
+                await typeLine("A voice whispers from the dark... 'Only the sacred ritual can free you.'", false, 1200);
+                await typeLine("Press Enter to approach the pedestal...");
+            }, { dense: true });
+
+            // STEP 1
+            await playStep(async () => {
+                await typeLine(" [THE CHAMBER OF THE ANCIENTS]", false, 500);
+                await typeLine("A curse has been cast upon your lineage.", false, 500);
+                await typeLine("You must break the five seals to survive.", false, 800);
+                await typeLine("Press Enter to begin the ritual...");
+            }, { center: true });
+
+            // STEP 2
+            clearScreen();
+            terminal.classList.remove('dense', 'hieroglyph-line', 'center-stage');
+            const parentName = await promptInput("Identify the target name to save: ");
+            await sleep(500);
+
+            await generateOutput(parentName);
+        }
+
+        // Initialize exactly on load
+        window.onload = runProgram;
+    </script>
+</body>
+
+</html>
