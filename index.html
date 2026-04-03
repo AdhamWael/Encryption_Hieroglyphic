@@ -76,30 +76,30 @@
         }
 
         .line {
-            font-size: 4.8vw;
+            font-size: clamp(16px, 4.8vmin, 5vw);
+            /* Fluid scaling with min/max safety */
             line-height: 1.25;
             font-weight: 700;
             letter-spacing: -0.02em;
             word-wrap: break-word;
             margin-bottom: 0.5vw;
             text-transform: uppercase;
-            /* High contrast solid gold text */
             color: #ffffff;
         }
 
         .dense .line {
-            font-size: 2.8vw;
+            font-size: clamp(12px, 2.8vmin, 3vw);
         }
 
         .hieroglyph-line .line {
-            font-size: 3.5vw;
+            font-size: clamp(14px, 3.5vmin, 4vw);
         }
 
         .input-line-wrapper {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            font-size: 4.8vw;
+            font-size: clamp(16px, 4.8vmin, 5vw);
             line-height: 1.25;
             font-weight: 700;
             letter-spacing: -0.02em;
@@ -114,8 +114,8 @@
 
         .cursor {
             display: inline-block;
-            width: 0.8vw;
-            height: 4.3vw;
+            width: 0.8vmin;
+            height: clamp(14px, 4.3vmin, 4.5vw);
             background-color: var(--lapis);
             vertical-align: text-bottom;
             margin-left: 0.4vw;
@@ -125,7 +125,7 @@
 
         .dense .cursor,
         .hieroglyph-line .cursor {
-            height: 2.8vw;
+            height: clamp(12px, 2.8vmin, 3vw);
         }
 
         /* Glowing curse effect for the final Hieroglyphs */
@@ -205,7 +205,7 @@
         }
 
         .victory-text {
-            font-size: 8vw;
+            font-size: 8vmin;
             color: #fff;
             text-shadow: 0 0 30px #ffcf00;
             margin-bottom: 2vw;
@@ -231,8 +231,6 @@
         ::selection {
             background: var(--lapis);
             color: #fff;
-            text-shadow: none;
-            -webkit-text-fill-color: #fff;
         }
 
         /* Dynamic Background Letters */
@@ -252,11 +250,9 @@
             color: rgba(255, 240, 180, 0.15);
             font-family: var(--font-main);
             font-weight: 700;
-            font-size: 10vw;
+            font-size: 10vmin;
             pointer-events: none;
-            text-shadow:
-                0 0 20px rgba(255, 215, 0, 0.5),
-                0 0 60px rgba(255, 165, 0, 0.3);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
             animation: bg-letter-fade 4s forwards cubic-bezier(0.22, 1, 0.36, 1);
             user-select: none;
             z-index: 0;
@@ -281,6 +277,86 @@
                 filter: blur(30px);
             }
         }
+
+        /* Responsive scaling */
+        @media (max-width: 900px) {
+            #terminal {
+                padding: 5vh 8vw;
+            }
+
+            .line,
+            .input-line-wrapper {
+                font-size: 8.5vmin;
+            }
+
+            .dense .line {
+                font-size: 6vmin;
+            }
+
+            .hieroglyph-line .line {
+                font-size: 7.5vmin;
+            }
+
+            .cursor {
+                width: 2vmin;
+                height: 7.5vmin;
+            }
+
+            .dense .cursor,
+            .hieroglyph-line .cursor {
+                height: 5.5vmin;
+            }
+
+            .victory-text {
+                font-size: 15vmin;
+            }
+
+            .victory-subtext {
+                font-size: 7.5vmin !important;
+            }
+
+            .victory-prompt {
+                font-size: 5vmin !important;
+            }
+        }
+
+        /* Mobile Landscape specific adjustments */
+        @media (max-width: 900px) and (orientation: landscape) {
+            #terminal {
+                padding: 3vh 5vw;
+            }
+
+            .line,
+            .input-line-wrapper {
+                font-size: 6vmin;
+            }
+
+            .dense .line {
+                font-size: 4vmin;
+            }
+
+            .hieroglyph-line .line {
+                font-size: 5vmin;
+            }
+
+            .cursor {
+                height: 5.5vmin;
+            }
+
+            .victory-text {
+                font-size: 12vmin;
+            }
+        }
+
+        .victory-subtext {
+            font-size: 2vmin;
+        }
+
+        .victory-prompt {
+            font-size: 1.2vmin;
+            margin-top: 4vw;
+            opacity: 0.5;
+        }
     </style>
 </head>
 
@@ -288,8 +364,9 @@
 
     <div id="game-overlay">
         <div class="victory-text">THE CURSE IS BROKEN</div>
-        <div class="line" style="font-size: 2vw;">YOUR LINEAGE IS FINALLY FREE</div>
-        <div class="line" style="font-size: 1.2vw; margin-top: 4vw; opacity: 0.5;">PRESS ENTER TO RETURN TO THE TOMB
+        <div class="line victory-subtext">YOUR LINEAGE IS FINALLY FREE</div>
+        <div class="line victory-prompt"><span id="interaction-prompt"></span>TAP SCREEN OR PRESS ENTER</span> TO RETURN
+            TO THE TOMB
         </div>
     </div>
     <div id="bg-letters-container"></div>
@@ -299,6 +376,19 @@
         const terminal = document.getElementById('terminal');
         const bgContainer = document.getElementById('bg-letters-container');
         const delay = 40; // Speed of typing in ms per character
+
+        // Device-specific interaction prompt
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const clickText = isTouch ? "Tap" : "Press Enter";
+        const interactionInstruction = isTouch ? "TAP SCREEN" : "PRESS ENTER";
+
+        // Update any static prompts on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const staticPrompt = document.getElementById('interaction-prompt');
+            if (staticPrompt) {
+                staticPrompt.textContent = interactionInstruction;
+            }
+        });
 
         function spawnLetter(char) {
             if (!char || char === ' ') return;
@@ -423,17 +513,20 @@
                 // Drop a blinking cursor indicating readiness for the next step 
                 const cLine = document.createElement('div');
                 cLine.className = 'line';
-                cLine.innerHTML = '<span style="font-size: 0.5em; opacity: 0.5;">[Unlock the Seal - Press Enter] </span><span class="cursor"></span>';
+                cLine.innerHTML = `<span style="font-size: 0.5em; opacity: 0.5;">[Unlock the Seal - ${clickText}] </span><span class="cursor"></span>`;
                 terminal.appendChild(cLine);
 
                 return new Promise(resolve => {
-                    const handler = (e) => {
-                        if (e.key === 'Enter') {
-                            document.removeEventListener('keydown', handler);
-                            resolve();
-                        }
+                    const proceed = () => {
+                        document.removeEventListener('keydown', keyHandler);
+                        document.removeEventListener('click', clickHandler);
+                        resolve();
                     };
-                    document.addEventListener('keydown', handler);
+                    const keyHandler = (e) => { if (e.key === 'Enter') proceed(); };
+                    const clickHandler = () => proceed();
+
+                    document.addEventListener('keydown', keyHandler);
+                    document.addEventListener('click', clickHandler);
                 });
             }
         }
@@ -548,15 +641,18 @@
             overlay.classList.add('active');
 
             return new Promise(resolve => {
-                const handler = (e) => {
-                    if (e.key === 'Enter') {
-                        document.removeEventListener('keydown', handler);
-                        overlay.classList.remove('active');
-                        resolve();
-                        runProgram();
-                    }
+                const proceed = () => {
+                    document.removeEventListener('keydown', keyHandler);
+                    document.removeEventListener('click', clickHandler);
+                    overlay.classList.remove('active');
+                    resolve();
+                    runProgram();
                 };
-                document.addEventListener('keydown', handler);
+                const keyHandler = (e) => { if (e.key === 'Enter') proceed(); };
+                const clickHandler = () => proceed();
+
+                document.addEventListener('keydown', keyHandler);
+                document.addEventListener('click', clickHandler);
             });
         }
 
@@ -566,7 +662,7 @@
                 await typeLine("You open your eyes. The air is heavy with the scent of ancient dust.", false, 1000);
                 await typeLine("Cold stone walls rise around you, etched with stories of a forgotten age.", false, 1000);
                 await typeLine("A voice whispers from the dark... 'Only the sacred ritual can free you.'", false, 1200);
-                await typeLine("Press Enter to approach the pedestal...");
+                await typeLine(`${clickText} to approach the pedestal...`);
             }, { dense: true });
 
             // STEP 1
@@ -574,7 +670,7 @@
                 await typeLine(" [THE CHAMBER OF THE ANCIENTS]", false, 500);
                 await typeLine("A curse has been cast upon your lineage.", false, 500);
                 await typeLine("You must break the five seals to survive.", false, 800);
-                await typeLine("Press Enter to begin the ritual...");
+                await typeLine(`${clickText} to begin the ritual...`);
             }, { center: true });
 
             // STEP 2
