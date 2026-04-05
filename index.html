@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hieroglyphic Name Encryption</title>
     <style>
-        /* Import Google Font for a modern, bold look */
+        /* Import Google Fonts for an ancient, archival look */
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
 
         :root {
             --bg-stone: #12100e;
@@ -52,21 +53,40 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.95) 100%);
+            background: radial-gradient(ellipse at 50% 30%, rgba(30, 18, 5, 0.4) 0%, rgba(0, 0, 0, 0.97) 80%);
             pointer-events: none;
             z-index: 1;
+        }
+
+        /* Faint horizontal scanline overlay for CRT-tomb feel */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(0, 0, 0, 0.08) 3px,
+                    rgba(0, 0, 0, 0.08) 4px);
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.6;
         }
 
         #terminal {
             width: 100%;
             height: 100%;
-            padding: 3vw 5vw;
+            padding: 14vh 7vw 14vh;
             box-sizing: border-box;
             display: block;
             position: relative;
             z-index: 10;
-            background: rgba(0, 0, 0, 0.4);
-            /* Ensures the exact text area is deeply dark */
+            background: linear-gradient(to bottom, rgba(15, 10, 5, 0.7) 0%, rgba(0, 0, 0, 0.55) 100%);
+            border-left: 1px solid rgba(212, 175, 55, 0.06);
+            border-right: 1px solid rgba(212, 175, 55, 0.06);
         }
 
         #terminal.center-stage {
@@ -75,31 +95,43 @@
             justify-content: center;
         }
 
+        @keyframes text-appear {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .line {
-            font-size: 4.8vw;
-            line-height: 1.25;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: clamp(16px, 3.8vmin, 4.2vw);
+            line-height: 1.5;
+            font-weight: 400;
+            letter-spacing: 0.08em;
             word-wrap: break-word;
-            margin-bottom: 0.5vw;
-            text-transform: uppercase;
-            /* High contrast solid gold text */
-            color: #ffffff;
+            margin-bottom: 0.8vw;
+            color: #e8d5aa;
+            text-shadow: 0 0 18px rgba(212, 175, 55, 0.25);
+            animation: text-appear 0.4s ease-out both;
         }
 
         .dense .line {
-            font-size: 2.8vw;
+            font-size: clamp(12px, 2.8vmin, 3vw);
         }
 
         .hieroglyph-line .line {
-            font-size: 3.5vw;
+            font-size: clamp(14px, 3.5vmin, 4vw);
         }
 
         .input-line-wrapper {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            font-size: 4.8vw;
+            font-size: clamp(16px, 4.8vmin, 5vw);
             line-height: 1.25;
             font-weight: 700;
             letter-spacing: -0.02em;
@@ -114,8 +146,8 @@
 
         .cursor {
             display: inline-block;
-            width: 0.8vw;
-            height: 4.3vw;
+            width: 0.6vmin;
+            height: clamp(14px, 4vmin, 4.2vw);
             background-color: var(--lapis);
             vertical-align: text-bottom;
             margin-left: 0.4vw;
@@ -125,7 +157,7 @@
 
         .dense .cursor,
         .hieroglyph-line .cursor {
-            height: 2.8vw;
+            height: clamp(12px, 2.8vmin, 3vw);
         }
 
         /* Glowing curse effect for the final Hieroglyphs */
@@ -205,7 +237,7 @@
         }
 
         .victory-text {
-            font-size: 8vw;
+            font-size: 8vmin;
             color: #fff;
             text-shadow: 0 0 30px #ffcf00;
             margin-bottom: 2vw;
@@ -231,94 +263,623 @@
         ::selection {
             background: var(--lapis);
             color: #fff;
-            text-shadow: none;
-            -webkit-text-fill-color: #fff;
         }
 
-        /* Dynamic Background Letters */
-        #bg-letters-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
+
+
+        /* Responsive scaling */
+        @media (max-width: 900px) {
+            #terminal {
+                padding: 5vh 8vw;
+            }
+
+            .line,
+            .input-line-wrapper {
+                font-size: 8.5vmin;
+            }
+
+            .dense .line {
+                font-size: 6vmin;
+            }
+
+            .hieroglyph-line .line {
+                font-size: 7.5vmin;
+            }
+
+            .cursor {
+                width: 2vmin;
+                height: 7.5vmin;
+            }
+
+            .dense .cursor,
+            .hieroglyph-line .cursor {
+                height: 5.5vmin;
+            }
+
+            .victory-text {
+                font-size: 15vmin;
+            }
+
+            .victory-subtext {
+                font-size: 7.5vmin !important;
+            }
+
+            .victory-prompt {
+                font-size: 5vmin !important;
+            }
+        }
+
+        /* Mobile Landscape specific adjustments */
+        @media (max-width: 900px) and (orientation: landscape) {
+            #terminal {
+                padding: 3vh 5vw;
+            }
+
+            .line,
+            .input-line-wrapper {
+                font-size: 6vmin;
+            }
+
+            .dense .line {
+                font-size: 4vmin;
+            }
+
+            .hieroglyph-line .line {
+                font-size: 5vmin;
+            }
+
+            .cursor {
+                height: 5.5vmin;
+            }
+
+            .victory-text {
+                font-size: 12vmin;
+            }
+        }
+
+        .victory-subtext {
+            font-size: 2vmin;
+        }
+
+        .victory-prompt {
+            font-size: 1.2vmin;
+            margin-top: 2vw;
+            opacity: 0.5;
+        }
+
+        .action-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 3vw;
+        }
+
+        .print-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: #fff;
+            padding: 12px 24px;
+            font-family: var(--font-main);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            z-index: 1001;
+            font-size: 14px;
+        }
+
+        .print-btn:hover {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Print layout with Ancient Papyrus aesthetic */
+        #print-report {
+            display: none;
+            background-color: #d2b48c;
+            color: #2c2419;
+            z-index: 9999;
+            font-family: 'EB Garamond', serif;
+        }
+
+        .report-page {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            padding: 25mm;
+            margin: 0 auto 20px auto;
+            box-sizing: border-box;
+            background-color: #f4e1c1;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+                url('https://www.transparenttextures.com/patterns/papyros.png');
+            border: 20px solid transparent;
+            border-image: url('https://www.transparenttextures.com/patterns/black-linen.png') 30 round;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
-        .bg-letter {
+        /* Gold side motif */
+        .report-page::after {
+            content: "𓂀";
             position: absolute;
-            color: rgba(255, 240, 180, 0.15);
-            font-family: var(--font-main);
-            font-weight: 700;
-            font-size: 10vw;
+            top: 20px;
+            right: 20px;
+            font-size: 50px;
+            color: #b8860b;
+            opacity: 0.1;
             pointer-events: none;
-            text-shadow:
-                0 0 20px rgba(255, 215, 0, 0.5),
-                0 0 60px rgba(255, 165, 0, 0.3);
-            animation: bg-letter-fade 4s forwards cubic-bezier(0.22, 1, 0.36, 1);
-            user-select: none;
-            z-index: 0;
         }
 
-        @keyframes bg-letter-fade {
-            0% {
-                transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
-                opacity: 0;
-                filter: blur(15px);
+        /* Sacred Eye Background */
+        .report-page::before {
+            content: "𓂀";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 400px;
+            color: #b8860b;
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 0;
+            font-family: sans-serif;
+        }
+
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .report-header::before,
+        .report-header::after {
+            content: "𓋹";
+            color: #8b4513;
+            font-size: 32px;
+            position: absolute;
+            bottom: -22px;
+            background: #f4e1c1;
+            padding: 0 15px;
+        }
+
+        .report-header::before {
+            left: 15%;
+        }
+
+        .report-header::after {
+            right: 15%;
+        }
+
+        .report-header h1 {
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #7a5a18;
+            /* Ancient Gold tint */
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            text-shadow: 1px 1px 0px rgba(184, 134, 11, 0.3);
+        }
+
+        .report-header p {
+            margin: 8px 0;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            font-family: 'Cinzel', serif;
+        }
+
+        .summary-section {
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-size: 16px;
+            text-align: center;
+            padding: 15px 30px;
+            font-style: italic;
+            border-top: 1px dashed rgba(139, 69, 19, 0.2);
+            border-bottom: 1px dashed rgba(139, 69, 19, 0.2);
+        }
+
+        .summary-section strong {
+            color: #8b6d2d;
+            text-shadow: 0 0 1px rgba(184, 134, 11, 0.2);
+        }
+
+
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 16px;
+            table-layout: fixed;
+        }
+
+        .report-table th {
+            background: rgba(139, 69, 19, 0.1);
+            color: #8b6d2d;
+            /* Ancient Gold tint */
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            padding: 12px;
+            border: 1px solid #8b4513;
+            font-family: 'Cinzel', serif;
+            text-shadow: 0 0 1px rgba(184, 134, 11, 0.2);
+        }
+
+        .report-table td {
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            padding: 10px;
+            text-align: center;
+            font-weight: 400;
+            word-wrap: break-word;
+        }
+
+        .report-page.dense-data .report-table {
+            font-size: 11px;
+        }
+
+        .report-page.dense-data .report-table td,
+        .report-page.dense-data .report-table th {
+            padding: 4px;
+        }
+
+        .report-table tr:nth-child(even) {
+            background: rgba(139, 69, 19, 0.03);
+        }
+
+        .report-seal-box {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #b8860b;
+            /* Gold border */
+            margin: 10px auto;
+            width: 60%;
+            position: relative;
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.1);
+        }
+
+        .report-hieros {
+            font-size: 60px;
+            margin: 20px 0;
+            display: block;
+            color: #3b2a1a;
+            filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.1));
+        }
+
+        .cartouche-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .cartouche {
+            display: inline-block;
+            border: 2px solid #b8860b;
+            /* Gold border */
+            border-radius: 40px;
+            padding: 10px 40px;
+            background: rgba(255, 255, 255, 0.3);
+            position: relative;
+            box-shadow: 0 0 10px rgba(184, 134, 11, 0.1);
+            max-width: 85%;
+            box-sizing: border-box;
+        }
+
+        .cartouche-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #7a5a18;
+            /* Ancient Gold tint */
+            word-wrap: break-word;
+            line-height: 1;
+            text-shadow: 0 0 1px rgba(184, 134, 11, 0.1);
+        }
+
+        .cartouche::before,
+        .cartouche::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: #8b4513;
+        }
+
+        .cartouche::before {
+            left: -25px;
+        }
+
+        .cartouche::after {
+            right: -25px;
+        }
+
+        .cartouche-name {
+            font-size: 44px;
+            font-weight: 400;
+            color: #2c2419;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1;
+        }
+
+        .archivist-note {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-top: auto;
+            border-top: 1px solid rgba(139, 69, 19, 0.3);
+            padding-top: 20px;
+            color: #4a3728;
+        }
+
+
+
+        .page-counter {
+            display: none;
+        }
+
+        .report-footer {
+            z-index: 1000;
+            margin-top: auto;
+            text-align: center;
+            opacity: 0.5;
+            font-size: 11px;
+            letter-spacing: 1px;
+            padding-bottom: 5px;
+            font-family: 'Cinzel', serif;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
             }
 
-            15% {
-                opacity: 0.7;
-                filter: blur(0px);
-                transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+            body {
+                background: white !important;
+                margin: 0;
+                padding: 0;
+                height: auto;
+                overflow: visible;
+            }
+
+            #terminal,
+            #game-overlay,
+            #bg-letters-container {
+                display: none !important;
+            }
+
+            #print-report {
+                display: block !important;
+                background: #f4e1c1 !important;
+            }
+
+            .report-page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                height: 297mm;
+                width: 210mm;
+                overflow: hidden;
+            }
+
+            .report-page:last-child {
+                page-break-after: auto;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Ancient Bottom Edge Decoration */
+        #ancient-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 12vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            pointer-events: none;
+            background: linear-gradient(to top, rgba(10, 8, 5, 1) 0%, rgba(10, 8, 5, 0.8) 30%, transparent 100%);
+            padding-bottom: 2vh;
+            box-sizing: border-box;
+            border-bottom: 4px solid #5a421b;
+        }
+
+        #ancient-footer::before {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 10vw;
+            right: 10vw;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6), transparent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.9);
+        }
+
+        #ancient-footer .gold-line {
+            flex-grow: 1;
+            height: 3px;
+            max-width: 38vw;
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.9), 0 0 4px rgba(255, 255, 255, 0.5);
+            opacity: 0.85;
+            border-radius: 50%;
+        }
+
+        #ancient-footer .hiero-symbol {
+            color: #fdf5e6;
+            font-size: clamp(26px, 4.5vh, 45px);
+            margin: 0 35px;
+            text-shadow:
+                0 0 5px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(212, 175, 55, 1),
+                0 0 40px rgba(212, 175, 55, 0.6),
+                0 -10px 50px rgba(200, 50, 0, 0.6);
+            letter-spacing: clamp(10px, 2vw, 25px);
+            font-family: serif;
+            animation: breathe-gold 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes breathe-gold {
+            0% {
+                filter: brightness(0.9) drop-shadow(0 0 10px rgba(212, 175, 55, 0.3));
+                transform: scale(1);
             }
 
             100% {
-                transform: translate(-50%, -50%) scale(2.5) translateY(-250px) rotate(-15deg);
-                opacity: 0;
-                filter: blur(30px);
+                filter: brightness(1.3) drop-shadow(0 0 30px rgba(255, 185, 75, 0.9));
+                transform: scale(1.05);
             }
+        }
+
+        /* Ancient Top Architrave */
+        #ancient-top-frame {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 12vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 5;
+            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(10, 8, 5, 1) 0%, rgba(10, 8, 5, 0.8) 30%, transparent 100%);
+            border-top: 4px solid #5a421b;
+            box-sizing: border-box;
+        }
+
+        #ancient-top-frame::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 10vw;
+            right: 10vw;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.6), transparent);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.9);
+        }
+
+        .corner-eye {
+            color: #fdf5e6;
+            font-size: clamp(35px, 6vh, 60px);
+            margin: 0 5vw;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.8), 0 0 25px rgba(255, 69, 0, 0.6);
+            opacity: 0.9;
+            font-family: serif;
+            filter: drop-shadow(0px 5px 15px rgba(212, 175, 55, 0.4));
+        }
+
+        .eye-right {
+            transform: scaleX(-1);
+        }
+
+        /* Ambient Side Pillars */
+        .ancient-pillar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 4vw;
+            z-index: 4;
+            pointer-events: none;
+            background: linear-gradient(90deg, rgba(5, 4, 3, 1) 0%, rgba(5, 4, 3, 0.8) 50%, transparent 100%);
+            border-left: 2px solid rgba(212, 175, 55, 0.15);
+            box-shadow: inset 10px 0 20px rgba(0, 0, 0, 1);
+        }
+
+        .pillar-right {
+            left: auto;
+            right: 0;
+            transform: scaleX(-1);
         }
     </style>
 </head>
 
 <body>
 
+    <!-- Cinematic Architrave & Pillars -->
+    <div id="ancient-top-frame">
+        <div class="corner-eye">𓁿</div>
+        <div class="corner-eye eye-right">𓁿</div>
+    </div>
+    <div class="ancient-pillar"></div>
+    <div class="ancient-pillar pillar-right"></div>
+
     <div id="game-overlay">
         <div class="victory-text">THE CURSE IS BROKEN</div>
-        <div class="line" style="font-size: 2vw;">YOUR LINEAGE IS FINALLY FREE</div>
-        <div class="line" style="font-size: 1.2vw; margin-top: 4vw; opacity: 0.5;">PRESS ENTER TO RETURN TO THE TOMB
+        <div class="line victory-subtext">YOUR LINEAGE IS FINALLY FREE</div>
+
+        <div class="action-container">
+            <button id="final-print-btn" class="print-btn no-print">Print Analysis</button>
+        </div>
+
+        <div class="line victory-prompt"><span id="interaction-prompt">PRESS ENTER</span> TO RETURN
+            TO THE TOMB
         </div>
     </div>
-    <div id="bg-letters-container"></div>
+
+    <!-- Hidden print-only report container -->
+    <div id="print-report"></div>
+
     <div id="terminal"></div>
+
+    <!-- Golden Altarpiece Floor -->
+    <div id="ancient-footer">
+        <div class="gold-line" style="background: linear-gradient(90deg, transparent, #d4af37);"></div>
+        <div class="hiero-symbol">𓋹 𓍹 𓂀 𓍹 𓋹</div>
+        <div class="gold-line" style="background: linear-gradient(270deg, transparent, #d4af37);"></div>
+    </div>
 
     <script>
         const terminal = document.getElementById('terminal');
-        const bgContainer = document.getElementById('bg-letters-container');
-        const delay = 40; // Speed of typing in ms per character
+        const printBtn = document.getElementById('final-print-btn');
+        const printReport = document.getElementById('print-report');
+        const delay = 80; // Slower narrative typing in ms per character
 
-        function spawnLetter(char) {
-            if (!char || char === ' ') return;
-            const letter = document.createElement('div');
-            letter.className = 'bg-letter';
-            letter.textContent = char.toUpperCase();
+        // Global storage for the final analysis
+        let currentAnalysis = {
+            name: "",
+            letters: "",
+            weights: "",
+            shifted: "",
+            vibration: "",
+            seal: ""
+        };
 
-            // Random position
-            const x = Math.random() * 100;
-            const y = Math.random() * 100;
+        // Device-specific interaction prompt
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const clickText = isTouch ? "Tap" : "Press Enter";
+        const interactionInstruction = isTouch ? "TAP SCREEN" : "PRESS ENTER";
 
-            letter.style.left = x + '%';
-            letter.style.top = y + '%';
+        // Update any static prompts on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const staticPrompt = document.getElementById('interaction-prompt');
+            if (staticPrompt) {
+                staticPrompt.textContent = interactionInstruction;
+            }
+        });
 
-            const rotate = (Math.random() - 0.5) * 60;
-            letter.style.transform += ` rotate(${rotate}deg)`;
 
-            bgContainer.appendChild(letter);
-            setTimeout(() => letter.remove(), 3000);
-        }
 
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -326,10 +887,42 @@
             terminal.innerHTML = "";
         }
 
-        async function typeLine(text, isHTML = false, addWait = 0) {
+        let globalAudio = null;
+        let audioPageCounter = 1;
+
+        async function playPageAudio() {
+            // Stop any currently playing narration
+            if (globalAudio) {
+                globalAudio.pause();
+                globalAudio.currentTime = 0;
+            }
+
+            const fileName = `${audioPageCounter}.mp3`;
+            audioPageCounter++;
+
+            try {
+                globalAudio = new Audio(fileName);
+                await globalAudio.play();
+            } catch (err) {
+                console.error(`Missing or failed to play: ${fileName}`, err);
+            }
+        }
+
+        async function typeLine(text, isHTML = false, addWait = 0, silent = false) {
+            const isFirstLine = (terminal.childElementCount === 0);
+
             const lineDiv = document.createElement('div');
             lineDiv.className = 'line';
             terminal.appendChild(lineDiv);
+
+            if (isFirstLine && !window.isSilentStep && !isHTML) {
+                if (text.trim().startsWith('[')) {
+                    // Delay audio until the bracket title completes
+                    setTimeout(playPageAudio, (text.length * delay) + 1200);
+                } else {
+                    playPageAudio();
+                }
+            }
 
             if (isHTML) {
                 lineDiv.innerHTML = text;
@@ -340,15 +933,17 @@
             for (let i = 0; i < text.length; i++) {
                 currentText += text.charAt(i);
                 lineDiv.innerHTML = currentText + '<span class="cursor"></span>';
-                spawnLetter(text.charAt(i));
                 await sleep(delay);
             }
             lineDiv.innerHTML = currentText;
+            await sleep(600); // Small pause between sentences
             if (addWait > 0) await sleep(addWait);
             return lineDiv;
         }
 
         async function promptInput(promptText) {
+            playPageAudio(); // Narrate the input line prompt
+
             const wrapper = document.createElement('div');
             wrapper.className = "input-line-wrapper";
             const label = document.createElement('span');
@@ -417,23 +1012,28 @@
             if (options.center) terminal.classList.add('center-stage');
             else terminal.classList.remove('center-stage');
 
+            window.isSilentStep = (options.silent === true);
+
             await linesCallback();
 
             if (options.waitForEnter !== false) {
                 // Drop a blinking cursor indicating readiness for the next step 
                 const cLine = document.createElement('div');
                 cLine.className = 'line';
-                cLine.innerHTML = '<span style="font-size: 0.5em; opacity: 0.5;">[Unlock the Seal - Press Enter] </span><span class="cursor"></span>';
+                cLine.innerHTML = `<span style="font-size: 0.5em; opacity: 0.5;">[Unlock the Seal - ${clickText}] </span><span class="cursor"></span>`;
                 terminal.appendChild(cLine);
 
                 return new Promise(resolve => {
-                    const handler = (e) => {
-                        if (e.key === 'Enter') {
-                            document.removeEventListener('keydown', handler);
-                            resolve();
-                        }
+                    const proceed = () => {
+                        document.removeEventListener('keydown', keyHandler);
+                        document.removeEventListener('click', clickHandler);
+                        resolve();
                     };
-                    document.addEventListener('keydown', handler);
+                    const keyHandler = (e) => { if (e.key === 'Enter') proceed(); };
+                    const clickHandler = () => proceed();
+
+                    document.addEventListener('keydown', keyHandler);
+                    document.addEventListener('click', clickHandler);
                 });
             }
         }
@@ -442,9 +1042,9 @@
             const lettersOnly = name.toUpperCase().replace(/[^A-Z]/g, '');
             if (!lettersOnly) {
                 await playStep(async () => {
-                    await typeLine("Error: No valid alphabetical letters found in the name.");
-                    await typeLine("Please try again.");
-                }, { waitForEnter: true });
+                    await typeLine("Error: No valid alphabetical letters found in the name.", false, 0, true);
+                    await typeLine("Please try again.", false, 0, true);
+                }, { waitForEnter: true, silent: true });
 
                 runProgram(); // Restart the experience
                 return;
@@ -470,6 +1070,16 @@
                 encLettersJoined += encChar;
             }
 
+            // Store for analysis
+            currentAnalysis = {
+                name: name,
+                letters: lettersOnly.split("").join(", "),
+                weights: origNumbers.join(", "),
+                shifted: encNumbers.join(", "),
+                vibration: encLetters.join(", "),
+                seal: ""
+            };
+
             // STEP 3
             await playStep(async () => {
                 await typeLine(`The Ancestor ${name} has been identified.`, false, 500);
@@ -480,34 +1090,38 @@
             // STEP 4
             await playStep(async () => {
                 await typeLine(" [SEAL 1: ALPHABETIC RECALL]", false, 400);
-                await typeLine(`Sacred Name: ${name}`, false, 400);
-                await typeLine(`Vibrational Letters: ${lettersOnly.split("").join(", ")}`);
+                await typeLine("The earthly flesh is stripped away, leaving only the bare letters of the ancestral name.");
+                await typeLine(`Sacred Name: ${name}`);
+                await typeLine(`Vibrational Letters: ${lettersOnly.split("").join(", ")}`, false, 0, true);
             });
 
             // STEP 5
             await playStep(async () => {
                 await typeLine(" [SEAL 2: NUMERICAL WEIGHT]", false, 400);
-                await typeLine("Each glyph carries a mortal weight (A=1...Z=26)", false, 400);
-                await typeLine(`Weight values: ${origNumbers.join(", ")}`);
+                await typeLine("The stripped letters descend into the scales of Ma'at to be judged and weighed.");
+                await typeLine("Each glyph carries a mortal weight from 1 to 26.[A=1...Z=26]");
+                await typeLine(`Weight values: ${origNumbers.join(", ")}`, false, 0, true);
             });
 
             // STEP 6
             await playStep(async () => {
                 await typeLine(" [SEAL 3: THE ALCHEMIST'S KEY]", false, 400);
-                await typeLine("To shift the fate, multiply the weight by 3 and add 2.", false, 400);
-                await typeLine("f(x) = 3x + 2 mod 26");
+                await typeLine("To alter destiny, the High Priest multiplies the mortal weight, adding the stones of balance.");
+                await typeLine("f(x) = 3x + 2 mod 26", false, 0, true);
             });
 
             // STEP 7
             await playStep(async () => {
                 await typeLine(" [SEAL 4: THE NEW DESTINY]", false, 400);
-                await typeLine(`Transmuted numbers: ${encNumbers.join(", ")}`);
+                await typeLine("The numbers are forged anew in the fiery depths, severing the cursed lineage forever.");
+                await typeLine(`Transmuted numbers: ${encNumbers.join(", ")}`, false, 0, true);
             });
 
             // STEP 8
             await playStep(async () => {
                 await typeLine(" [SEAL 5: PHONETIC SHIFT]", false, 400);
-                await typeLine(`New vibration: ${encLetters.join(", ")}`);
+                await typeLine("A new vibration emerges from the ashes, free from the old shadow.");
+                await typeLine(`New vibration: ${encLetters.join(", ")}`, false, 0, true);
             });
 
             const hieroglyphMap = {
@@ -531,7 +1145,10 @@
                 }
                 await typeLine(`Final Holy Seal:`, false, 300);
                 await typeLine(`<span class="hieroglyph">${hieroglyphs}</span>`, true);
+                currentAnalysis.seal = hieroglyphs;
             }, { hiero: true });
+            await typeLine("THE CURSE IS WEAKENING...");
+
 
             // STEP 10
             await playStep(async () => {
@@ -539,7 +1156,6 @@
                 await typeLine(`Ancestor: ${name}`);
                 await typeLine(`Sacred Seal: <span class="hieroglyph">${hieroglyphs}</span>`, true);
                 await sleep(1000);
-                await typeLine("THE CURSE IS WEAKENING...");
                 await sleep(1500);
             }, { dense: true, waitForEnter: true });
 
@@ -547,26 +1163,107 @@
             const overlay = document.getElementById('game-overlay');
             overlay.classList.add('active');
 
+            // Hook up print button
+            printBtn.onclick = (e) => {
+                e.stopPropagation(); // Don't close overlay
+
+                const lArr = currentAnalysis.letters.split(", ");
+                const wArr = currentAnalysis.weights.split(", ");
+                const sArr = currentAnalysis.shifted.split(", ");
+                const vArr = currentAnalysis.vibration.split(", ");
+                const gArr = Array.from(currentAnalysis.seal);
+
+                let rowsHtml = "";
+                for (let i = 0; i < lArr.length; i++) {
+                    rowsHtml += `
+                        <tr>
+                            <td>${lArr[i]}</td>
+                            <td>${wArr[i]}</td>
+                            <td>${sArr[i]}</td>
+                            <td style="font-size: 24px;">${gArr[i] || ""}</td>
+                        </tr>
+                    `;
+                }
+
+                const dateStr = new Date().toLocaleDateString();
+                const timeStr = new Date().toLocaleTimeString();
+
+                // Determine if we need dense mode based on result length (>7 characters)
+                const isDense = lArr.length > 7;
+
+                // Construct and trigger report with a single defined page
+                printReport.innerHTML = `
+                    <!-- SINGLE PAGE ARCHIVE -->
+                    <div class="report-page ${isDense ? 'dense-data' : ''}">
+                        <div class="watermark"></div>
+                        <div class="report-header">
+                            <h1>The Pharaonic Archive</h1>
+                            <p>Sacred Transmutation Record</p>
+                            <p>${dateStr} | ${timeStr}</p>
+                        </div>
+
+                        <div class="summary-section">
+                            <p>By the law of <strong>f(x) = 3x + 2 (mod 26)</strong>, the spirit of <strong>${currentAnalysis.name}</strong> has passed the halls of justice and the spirit has been aligned with the eternal stones.</p>
+                        </div>
+
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Glyph</th>
+                                    <th>Weight</th>
+                                    <th>f(x)</th>
+                                    <th>Symbol</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                        
+                        <div class="cartouche-container">
+                            <div class="cartouche">
+                                <div class="cartouche-name" style="font-size: 40px; letter-spacing: 2px;">${currentAnalysis.seal}</div>
+                            </div>
+                            <p style="font-size: 10px; margin-top: 10px; opacity: 0.6; letter-spacing: 2px;">Your Secret Pharaoh Identity</p>
+                        </div>
+
+                        <div class="archivist-note">
+                            <p>The subject's lineage is now decoupled from the shadow currency and aligned with the eternal stones. No further sacrifices are required.</p>
+                        </div>
+
+                        <div class="report-footer">Designed By Adham Eldeeb</div>
+                    </div>
+                `;
+                window.print();
+            };
+
             return new Promise(resolve => {
-                const handler = (e) => {
-                    if (e.key === 'Enter') {
-                        document.removeEventListener('keydown', handler);
-                        overlay.classList.remove('active');
-                        resolve();
-                        runProgram();
-                    }
+                const proceed = (e) => {
+                    // Ignore if clicking the print button
+                    if (e.target && e.target.id === 'final-print-btn') return;
+
+                    document.removeEventListener('keydown', keyHandler);
+                    document.removeEventListener('click', clickHandler);
+                    overlay.classList.remove('active');
+                    resolve();
+                    runProgram();
                 };
-                document.addEventListener('keydown', handler);
+                const keyHandler = (e) => { if (e.key === 'Enter') proceed(e); };
+                const clickHandler = (e) => proceed(e);
+
+                document.addEventListener('keydown', keyHandler);
+                document.addEventListener('click', clickHandler);
             });
         }
 
         async function runProgram() {
+            audioPageCounter = 1; // Reset counter for the pages at the beginning
             // PROLOGUE
             await playStep(async () => {
                 await typeLine("You open your eyes. The air is heavy with the scent of ancient dust.", false, 1000);
                 await typeLine("Cold stone walls rise around you, etched with stories of a forgotten age.", false, 1000);
                 await typeLine("A voice whispers from the dark... 'Only the sacred ritual can free you.'", false, 1200);
-                await typeLine("Press Enter to approach the pedestal...");
+                await typeLine(`${clickText} to approach the pedestal...`);
             }, { dense: true });
 
             // STEP 1
@@ -574,7 +1271,7 @@
                 await typeLine(" [THE CHAMBER OF THE ANCIENTS]", false, 500);
                 await typeLine("A curse has been cast upon your lineage.", false, 500);
                 await typeLine("You must break the five seals to survive.", false, 800);
-                await typeLine("Press Enter to begin the ritual...");
+                await typeLine(`${clickText} to begin the ritual...`);
             }, { center: true });
 
             // STEP 2
@@ -586,8 +1283,32 @@
             await generateOutput(parentName);
         }
 
-        // Initialize exactly on load
-        window.onload = runProgram;
+        // Initialize on interaction to allow audio playback
+        window.addEventListener('DOMContentLoaded', () => {
+            // Pre-load voices
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+            }
+        });
+
+        window.onload = () => {
+            terminal.innerHTML = '<div class="line" style="text-align: center; margin-top: 40vh; cursor: pointer; color: var(--gold-main); font-size: 3vw; animation: pulse-curse 2s infinite alternate;">[ CLICK TO AWAKEN THE ANCIENTS ]</div>';
+
+            const startHandler = () => {
+                document.removeEventListener('click', startHandler);
+                clearScreen();
+
+                // Play silent audio to unlock speech synthesis
+                if ('speechSynthesis' in window) {
+                    const u = new SpeechSynthesisUtterance('');
+                    u.volume = 0;
+                    window.speechSynthesis.speak(u);
+                }
+
+                runProgram();
+            };
+            document.addEventListener('click', startHandler);
+        };
     </script>
 </body>
 
