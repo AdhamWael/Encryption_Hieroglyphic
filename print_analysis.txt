@@ -1,0 +1,394 @@
+HTML Container:
+```html
+    <!-- Hidden print-only report container -->
+    <div id="print-report"></div>
+```
+
+CSS Styling for Print:
+```css
+        /* Enhanced Print layout with Ancient Papyrus aesthetic */
+        #print-report {
+            display: none;
+            background-color: #d2b48c;
+            color: #2c2419;
+            z-index: 9999;
+            font-family: 'EB Garamond', serif;
+        }
+
+        .report-page {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            padding: 25mm;
+            margin: 0 auto 20px auto;
+            box-sizing: border-box;
+            background-color: #f4e1c1;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(139, 69, 19, 0.05) 0%, transparent 50%),
+                url('https://www.transparenttextures.com/patterns/papyros.png');
+            border: 20px solid transparent;
+            border-image: url('https://www.transparenttextures.com/patterns/black-linen.png') 30 round;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.1), 0 0 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Gold side motif */
+        .report-page::after {
+            content: "𓂀";
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 50px;
+            color: #b8860b;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* Sacred Eye Background */
+        .report-page::before {
+            content: "𓂀";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 400px;
+            color: #b8860b;
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 0;
+            font-family: sans-serif;
+        }
+
+        .report-header {
+            text-align: center;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .report-header::before,
+        .report-header::after {
+            content: "𓋹";
+            color: #8b4513;
+            font-size: 32px;
+            position: absolute;
+            bottom: -22px;
+            background: #f4e1c1;
+            padding: 0 15px;
+        }
+
+        .report-header::before {
+            left: 15%;
+        }
+
+        .report-header::after {
+            right: 15%;
+        }
+
+        .report-header h1 {
+            margin: 0;
+            font-size: 32px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #7a5a18;
+            /* Ancient Gold tint */
+            font-family: 'Cinzel', serif;
+            font-weight: 900;
+            text-shadow: 1px 1px 0px rgba(184, 134, 11, 0.3);
+        }
+
+        .report-header p {
+            margin: 8px 0;
+            font-size: 16px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            font-family: 'Cinzel', serif;
+        }
+
+        .summary-section {
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-size: 16px;
+            text-align: center;
+            padding: 15px 30px;
+            font-style: italic;
+            border-top: 1px dashed rgba(139, 69, 19, 0.2);
+            border-bottom: 1px dashed rgba(139, 69, 19, 0.2);
+        }
+
+        .summary-section strong {
+            color: #8b6d2d;
+            text-shadow: 0 0 1px rgba(184, 134, 11, 0.2);
+        }
+
+
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 16px;
+            table-layout: fixed;
+        }
+
+        .report-table th {
+            background: rgba(139, 69, 19, 0.1);
+            color: #8b6d2d;
+            /* Ancient Gold tint */
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            padding: 12px;
+            border: 1px solid #8b4513;
+            font-family: 'Cinzel', serif;
+            text-shadow: 0 0 1px rgba(184, 134, 11, 0.2);
+        }
+
+        .report-table td {
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            padding: 10px;
+            text-align: center;
+            font-weight: 400;
+            word-wrap: break-word;
+        }
+
+        .report-page.dense-data .report-table {
+            font-size: 11px;
+        }
+
+        .report-page.dense-data .report-table td,
+        .report-page.dense-data .report-table th {
+            padding: 4px;
+        }
+
+        .report-table tr:nth-child(even) {
+            background: rgba(139, 69, 19, 0.03);
+        }
+
+        .report-seal-box {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #b8860b;
+            /* Gold border */
+            margin: 10px auto;
+            width: 60%;
+            position: relative;
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.1);
+        }
+
+        .report-hieros {
+            font-size: 60px;
+            margin: 20px 0;
+            display: block;
+            color: #3b2a1a;
+            filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.1));
+        }
+
+        .cartouche-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .cartouche {
+            display: inline-block;
+            border: 2px solid #b8860b;
+            /* Gold border */
+            border-radius: 40px;
+            padding: 10px 40px;
+            background: rgba(255, 255, 255, 0.3);
+            position: relative;
+            box-shadow: 0 0 10px rgba(184, 134, 11, 0.1);
+            max-width: 85%;
+            box-sizing: border-box;
+        }
+
+        .cartouche-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #7a5a18;
+            /* Ancient Gold tint */
+            word-wrap: break-word;
+            line-height: 1;
+            text-shadow: 0 0 1px rgba(184, 134, 11, 0.1);
+        }
+
+        .cartouche::before,
+        .cartouche::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: #8b4513;
+        }
+
+        .cartouche::before {
+            left: -25px;
+        }
+
+        .cartouche::after {
+            right: -25px;
+        }
+
+        .cartouche-name {
+            font-size: 44px;
+            font-weight: 400;
+            color: #2c2419;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            line-height: 1;
+        }
+
+        .archivist-note {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-top: auto;
+            border-top: 1px solid rgba(139, 69, 19, 0.3);
+            padding-top: 20px;
+            color: #4a3728;
+        }
+
+        .page-counter {
+            display: none;
+        }
+
+        .report-footer {
+            z-index: 1000;
+            margin-top: auto;
+            text-align: center;
+            opacity: 0.5;
+            font-size: 11px;
+            letter-spacing: 1px;
+            padding-bottom: 5px;
+            font-family: 'Cinzel', serif;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background: white !important;
+                margin: 0;
+                padding: 0;
+                height: auto;
+                overflow: visible;
+            }
+
+            #terminal,
+            #game-overlay,
+            #bg-letters-container {
+                display: none !important;
+            }
+
+            #print-report {
+                display: block !important;
+                background: #f4e1c1 !important;
+            }
+
+            .report-page {
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                height: 297mm;
+                width: 210mm;
+                overflow: hidden;
+            }
+
+            .report-page:last-child {
+                page-break-after: auto;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+```
+
+JS Handler:
+```javascript
+            // Hook up print button
+            printBtn.onclick = (e) => {
+                e.stopPropagation(); // Don't close overlay
+
+                const lArr = currentAnalysis.letters.split(", ");
+                const wArr = currentAnalysis.weights.split(", ");
+                const sArr = currentAnalysis.shifted.split(", ");
+                const vArr = currentAnalysis.vibration.split(", ");
+                const gArr = Array.from(currentAnalysis.seal);
+
+                let rowsHtml = "";
+                for (let i = 0; i < lArr.length; i++) {
+                    rowsHtml += \`
+                        <tr>
+                            <td>\${lArr[i]}</td>
+                            <td>\${wArr[i]}</td>
+                            <td>\${sArr[i]}</td>
+                            <td style="font-size: 24px;">\${gArr[i] || ""}</td>
+                        </tr>
+                    \`;
+                }
+
+                const dateStr = new Date().toLocaleDateString();
+                const timeStr = new Date().toLocaleTimeString();
+
+                // Determine if we need dense mode based on result length (>7 characters)
+                const isDense = lArr.length > 7;
+
+                // Construct and trigger report with a single defined page
+                printReport.innerHTML = \`
+                    <!-- SINGLE PAGE ARCHIVE -->
+                    <div class="report-page \${isDense ? 'dense-data' : ''}">
+                        <div class="watermark"></div>
+                        <div class="report-header">
+                            <h1>The Pharaonic Archive</h1>
+                            <p>Sacred Transmutation Record</p>
+                            <p>\${dateStr} | \${timeStr}</p>
+                        </div>
+
+                        <div class="summary-section">
+                            <p>By the law of <strong>f(x) = 3x + 2 (mod 26)</strong>, the spirit of <strong>\${currentAnalysis.name}</strong> has passed the halls of justice and the spirit has been aligned with the eternal stones.</p>
+                        </div>
+
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Glyph</th>
+                                    <th>Weight</th>
+                                    <th>f(x)</th>
+                                    <th>Symbol</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                \${rowsHtml}
+                            </tbody>
+                        </table>
+                        
+                        <div class="cartouche-container">
+                            <div class="cartouche">
+                                <div class="cartouche-name" style="font-size: 40px; letter-spacing: 2px;">\${currentAnalysis.seal}</div>
+                            </div>
+                            <p style="font-size: 10px; margin-top: 10px; opacity: 0.6; letter-spacing: 2px;">Your Secret Pharaoh Identity</p>
+                        </div>
+
+                        <div class="archivist-note">
+                            <p>The subject's lineage is now decoupled from the shadow currency and aligned with the eternal stones. No further sacrifices are required.</p>
+                        </div>
+
+                        <div class="report-footer">Designed By Adham Eldeeb</div>
+                    </div>
+                \`;
+                window.print();
+            };
+```

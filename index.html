@@ -812,6 +812,58 @@
             right: 0;
             transform: scaleX(-1);
         }
+
+        /* Cinematic Curse Impact Enhancements */
+        body.curse-strike {
+            animation: screenShake 0.6s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        body.curse-strike::after {
+            animation: curseFlash 2s ease-out;
+        }
+
+        @keyframes screenShake {
+
+            0%,
+            100% {
+                transform: translate3d(0, 0, 0);
+                filter: saturate(1);
+            }
+
+            10%,
+            90% {
+                transform: translate3d(-3px, 2px, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(4px, -2px, 0);
+                filter: saturate(1.5) contrast(1.2);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-6px, 4px, 0);
+                filter: saturate(2) contrast(1.5) hue-rotate(-10deg);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(6px, -4px, 0);
+                filter: saturate(0) contrast(1.5) invert(0.1);
+            }
+        }
+
+        @keyframes curseFlash {
+            0% {
+                background: radial-gradient(ellipse at 50% 30%, rgba(180, 0, 0, 0.6) 0%, rgba(30, 0, 0, 0.97) 80%);
+            }
+
+            100% {
+                background: radial-gradient(ellipse at 50% 30%, rgba(30, 18, 5, 0.4) 0%, rgba(0, 0, 0, 0.97) 80%);
+            }
+        }
     </style>
 </head>
 
@@ -842,6 +894,9 @@
     <div id="print-report"></div>
 
     <div id="terminal"></div>
+
+    <audio id="bg-music" src="music.mpeg" loop></audio>
+    <audio id="bass-sound" src="bass.mpeg"></audio>
 
     <!-- Golden Altarpiece Floor -->
     <div id="ancient-footer">
@@ -933,6 +988,27 @@
             for (let i = 0; i < text.length; i++) {
                 currentText += text.charAt(i);
                 lineDiv.innerHTML = currentText + '<span class="cursor"></span>';
+
+                if (currentText.toLowerCase().endsWith('curse')) {
+                    const bass = document.getElementById('bass-sound');
+                    if (bass) {
+                        bass.currentTime = 0;
+                        bass.play().catch(e => console.log(e));
+
+                        // Screen Flash and Shake 
+                        document.body.classList.remove('curse-strike');
+                        void document.body.offsetWidth; // Trigger reflow
+                        document.body.classList.add('curse-strike');
+
+                        // Audio Ducking 
+                        const bgMusic = document.getElementById('bg-music');
+                        if (bgMusic) {
+                            bgMusic.volume = 0.1;
+                            setTimeout(() => { if (bgMusic.volume < 0.5) bgMusic.volume = 0.5; }, 2000);
+                        }
+                    }
+                }
+
                 await sleep(delay);
             }
             lineDiv.innerHTML = currentText;
@@ -1160,6 +1236,23 @@
             }, { dense: true, waitForEnter: true });
 
             // Victory Screen
+            const bass = document.getElementById('bass-sound');
+            if (bass) {
+                bass.currentTime = 0;
+                bass.play().catch(e => console.log(e));
+
+                // Screen Flash and Shake
+                document.body.classList.remove('curse-strike');
+                void document.body.offsetWidth; // Trigger reflow
+                document.body.classList.add('curse-strike');
+
+                // Audio Ducking 
+                const bgMusic = document.getElementById('bg-music');
+                if (bgMusic) {
+                    bgMusic.volume = 0.1;
+                    setTimeout(() => { if (bgMusic.volume < 0.5) bgMusic.volume = 0.5; }, 2000);
+                }
+            }
             const overlay = document.getElementById('game-overlay');
             overlay.classList.add('active');
 
@@ -1297,6 +1390,12 @@
             const startHandler = () => {
                 document.removeEventListener('click', startHandler);
                 clearScreen();
+
+                const bgMusic = document.getElementById('bg-music');
+                if (bgMusic) {
+                    bgMusic.volume = 0.5;
+                    bgMusic.play().catch(e => console.log(e));
+                }
 
                 // Play silent audio to unlock speech synthesis
                 if ('speechSynthesis' in window) {
